@@ -51,9 +51,52 @@ class PageController extends Controller
         return view('admin/dashboard', compact('totalUser', 'activeProjectCount', 'monthRev', 'monthEXP', 'monthlyData', 'recentProjects'));
     }
 
-    public function Employees(){
+    public function Employees(Request $request){
         $employees = Employee::all();
-        return view('admin/employees', compact('employees'));
+
+        $editEmp = null;
+        if ($request->has('edit')) {
+            $editEmp = Employee::findOrFail($request->query('edit'));
+        }
+
+        $depts = ['Web Dev', 'App Dev', 'Game Dev', 'Marketing', 'Design', 'Management'];
+        $statuses = ['active', 'on_leave', 'inactive'];
+
+        return view('admin/employees', compact('employees', 'depts', 'editEmp', 'statuses'));
+    }
+
+//    public function EmployeeShow($id){
+//        $employeeShow = Employee::findOrFail($id);
+//        return view('admin/employees', compact('employeeShow', ));
+//    }
+
+//    employee store function
+    public function EmployeeStore(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id'               => 'nullable|integer|exists:users,id',
+            'name'                  => 'required|string|max:100',
+            'email'                 => 'required|email|max:100|unique:employees,email',
+            'phone'                 => 'nullable|string|max:20',
+            'department'            => 'required|in:Web Dev,App Dev,Game Dev,Marketing,Design,Other',
+            'designation'           => 'nullable|string|max:100',
+            'salary'                => 'nullable|numeric|min:0',
+            'join_date'             => 'nullable|date',
+            'nid'                   => 'nullable|string|max:50',
+            'address'               => 'nullable|string',
+            'status'                => 'nullable|in:active,on_leave,inactive',
+            'payment_method'        => 'nullable|in:bank,bkash,nagad,rocket,cash',
+            'bank_name'             => 'nullable|string|max:100',
+            'bank_account'          => 'nullable|string|max:100',
+            'mobile_banking_number' => 'nullable|string|max:20',
+            'photo'                 => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            $validated['photo'] = $request->file('photo')->store('employees/photos', 'public');
+        }
+         Employee::create($validated);
+        return redirect()->back()->with('success', 'Employee created successfully!');
     }
 
     public function Attendance(){

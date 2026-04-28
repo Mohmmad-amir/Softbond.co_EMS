@@ -13,6 +13,8 @@ route::post("/login", [AuthController::class, "login"])->name("login");
 Route::middleware("auth")->group(function () {
 Route::get("/admin/dashboard", [pageController::class, "AdminDashboard"])->name("admin.dashboard");
 Route::get("/admin/employees", [pageController::class, "Employees"])->name("admin.employees");
+Route::post('/admin/employees/store', [PageController::class, 'EmployeeStore'])->name('admin.employees.store');
+//Route::get('/admin/employees/{id}/show', [PageController::class, 'EmployeeShow'])->name('admin.employees.show');
 Route::get("/admin/attendance", [pageController::class, "Attendance"])->name("admin.attendance");
 Route::get("/admin/salary", [pageController::class, "Salary"])->name("admin.salary");
 Route::get("/admin/project/", [pageController::class, "Project"])->name("admin.project");

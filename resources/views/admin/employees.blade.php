@@ -22,12 +22,12 @@
     </form>
 
     <!-- Employee Cards -->
-    @foreach( $employees as $employee)
     <div class="emp-cards">
+        @foreach( $employees as $employee)
         <div class="emp-card">
             <!-- Photo / Avatar -->
             <div class="emp-card-header">
-                <img src="" alt="photo" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0">
+                <img src="{{ asset('storage/' . $employee->photo) }}" alt="photo" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0">
                 <div class="avatar " style="width:48px;height:48px;font-size:16px"></div>
                 <div>
                     <div class="fw-600" style="font-size:14px"> {{$employee-> name}} </div>
@@ -46,19 +46,21 @@
                 <div class="row"><span class="lbl">Status</span><span>{{$employee->status}}</span></div>
             </div>
             <div class="emp-card-actions">
-                <a class="btn btn-outline btn-sm" href="?edit=">Edit</a>
+                <a class="btn btn-outline btn-sm" href="?edit={{$employee->id}}">Edit</a>
                 <a class="btn btn-outline btn-sm" href="?docs=">Docs</a>
                 <a class="btn btn-danger btn-sm" href="?delete=" onclick="return confirm('Delete this employee?')">Del</a>
             </div>
         </div>
+        @endforeach
     </div>
-    @endforeach
     <!-- ── ADD MODAL ─────────────────────────────────────────────────────────── -->
     <div class="modal-overlay" id="addModal">
         <div class="modal" style="max-width:680px">
             <div class="modal-header"><h3>Add New Employee</h3>
                 <button class="modal-close" onclick="document.getElementById('addModal').classList.remove('open')">×</button></div>
-            <form method="POST" enctype="multipart/form-data" class="modal-body">
+            <form method="POST" action="{{ route('admin.employees.store') }}" enctype="multipart/form-data" class="modal-body">
+                @method('POST')
+                @csrf
                 <input type="hidden" name="action" value="add">
                 <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Basic Info</p>
                 <div class="form-row">
@@ -72,8 +74,9 @@
                 <div class="form-row">
                     <div class="form-group"><label class="form-label">Department *</label>
                         <select name="department" class="form-control" required>
-                            <option value="">Select</option>
-{{--                           dynamic all departmeent--}}
+                            @foreach($depts as $d)
+                                <option value="{{ $d }}">{{ $d }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group"><label class="form-label">Designation</label><input name="designation" class="form-control"></div>
@@ -125,45 +128,61 @@
             </form>
         </div></div>
 
+
+
     <!-- ── EDIT MODAL ─────────────────────────────────────────────────────────── -->
     <div class="modal-overlay {{ request()->has('edit') ? 'open' : '' }}" id="editModal">
         <div class="modal" style="max-width:680px">
-            <div class="modal-header"><h3>Edit Employee</h3><a class="modal-close" href="{{route('admin.employees')}}">×</a></div>
+            <div class="modal-header"><h3>Edit Employee</h3>
+            <button class="modal-close" onclick="
+                document.getElementById('editModal').classList.remove('open');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            ">×</button></div>
+            @if($editEmp)
             <form method="POST" enctype="multipart/form-data" class="modal-body">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="id" value="">
                 <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Basic Info</p>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label">Full Name</label><input name="name" class="form-control" value="" required></div>
-                    <div class="form-group"><label class="form-label">Phone</label><input name="phone" class="form-control" value=""></div>
+                    <div class="form-group"><label class="form-label">Full Name</label><input name="name" class="form-control" value="{{ $editEmp->name }}" required></div>
+                    <div class="form-group"><label class="form-label">Phone</label><input name="phone" class="form-control" value="{{ $editEmp->phone }}"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label class="form-label">Department</label>
                         <select name="department" class="form-control">
-
-
+                            @foreach($depts as $d)
+                                <option value="{{ $d }}" {{ $editEmp->department == $d ? 'selected' : '' }}>
+                                    {{ $d }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
-                    <div class="form-group"><label class="form-label">Designation</label><input name="designation" class="form-control" value=""></div>
+                    <div class="form-group"><label class="form-label">Designation</label><input name="designation" class="form-control" value="{{$editEmp->designation}}"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label">Salary (৳)</label><input type="number" name="salary" class="form-control" value=""></div>
-                    <div class="form-group"><label class="form-label">Join Date</label><input type="date" name="join_date" class="form-control" value=""></div>
+                    <div class="form-group"><label class="form-label">Salary (৳)</label><input type="number" name="salary" class="form-control" value="{{$editEmp->salary}}"></div>
+                    <div class="form-group"><label class="form-label">Join Date</label><input type="date" name="join_date" class="form-control" value="{{ $editEmp->join_date ? \Carbon\Carbon::parse($editEmp->join_date)->format('Y-m-d') : '' }}"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label">NID</label><input name="nid" class="form-control" value=""></div>
+                    <div class="form-group"><label class="form-label">NID</label><input name="nid" class="form-control" value="{{$editEmp->nid}}"></div>
                     <div class="form-group"><label class="form-label">Status</label>
                         <select name="status" class="form-control">
-
+                            @foreach($statuses as $s)
+                                <option value="{{ $s }}" {{ $editEmp->status == $s ? 'selected' : '' }}>
+                                    {{ Str::headline($s) }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
-                <div class="form-group"><label class="form-label">Address</label><textarea name="address" class="form-control"></textarea></div>
+                <div class="form-group"><label class="form-label">Address</label><textarea name="address" class="form-control">{{$editEmp->address}}</textarea></div>
 
                 <!-- Photo -->
                 <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 12px;border-top:1px solid var(--border);padding-top:16px">Profile Photo</p>
                 <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                    <img src="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--border)" alt="">
+                    @if($editEmp->photo)
+                    <img src="{{ asset('storage/' . $employee->photo) }}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--border)" alt="">
+                    @endif
                     <span style="font-size:12px;color:var(--text-muted)">Current photo. Upload new to replace.</span>
                 </div>
                 <div class="form-group"><label class="form-label">Upload New Photo (JPG/PNG)</label><input type="file" name="photo" class="form-control" accept="image/*"></div>
@@ -173,7 +192,11 @@
                 <div class="form-group">
                     <label class="form-label">Payment Via</label>
                     <select name="payment_method" class="form-control" id="edit_pm" onchange="togglePayment(this,'edit')">
-
+                        @foreach(['bank','bkash','nagad','rocket','cash'] as $pm)
+                            <option value="{{ $pm }}" {{ $editEmp->payment_method == $pm ? 'selected' : '' }}>
+                                {{ Str::headline($pm) }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
                 <div id="edit_bank" style="">
@@ -187,14 +210,17 @@
                 </div>
 
                 <div class="modal-footer">
-                    <a class="btn btn-outline" href="{{route('admin.employees')}}">Cancel</a>
+                    <a href="#" class="btn btn-outline" onclick="
+                    document.getElementById('editModal').classList.remove('open');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                ">Cancel</a>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
+            @endif
         </div></div>
-    <?php //endif; ?>
 
-        <!-- ── DOCUMENTS MODAL ───────────────────────────────────────────────────── -->
+    <!-- ── DOCUMENTS MODAL ───────────────────────────────────────────────────── -->
     <div class="modal-overlay {{ request()->has('docs') ? 'open' : '' }}">
         <div class="modal">
             <div class="modal-header"><h3>Documents — </h3><a class="modal-close" href="{{route('admin.employees')}}">×</a></div>
