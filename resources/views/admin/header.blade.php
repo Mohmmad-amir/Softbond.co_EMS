@@ -1,7 +1,3 @@
-<?php
-//$current = basename($_SERVER['PHP_SELF'], '.php');
-//$pendingSalary = db()->query("SELECT COUNT(*) as c FROM salary_requests WHERE status='pending'")->fetch_assoc()['c'];
-//?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,7 +46,7 @@
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         Projects
       </a>
-      <a class="nav-item " href="/admin/tasks.php">
+      <a class="nav-item {{ request()->routeIs('admin.task') ? 'active' : '' }}" href="{{ route('admin.task') }}">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         Tasks
       </a>

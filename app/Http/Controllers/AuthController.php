@@ -23,7 +23,7 @@ public function login(Request $request) {
             if ($user->role == 'admin'){
                 return redirect()->route('admin.dashboard');
             }
-            if ($user->role == 'user') {
+            if ($user->role == 'employee') {
                 return redirect()->route('/');
             }
             return redirect()->route('admin.login');

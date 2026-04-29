@@ -8,17 +8,21 @@
     </div>
 
     <!-- Filter -->
-    <form method="GET" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
-        <input name="search" class="form-control" placeholder="Search name or email..." style="max-width:220px" value="">
+    <form method="GET" action="{{ route('admin.employees') }}" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <input name="search" value="{{$search}}" class="form-control" placeholder="Search name or email..." style="max-width:220px">
         <select name="dept" class="form-control" style="max-width:160px">
             <option value="">All Departments</option>
-
+            @foreach($depts as $d)
+                <option value="{{ $d }}" {{ $dept == $d ? 'selected' : '' }}>{{ $d }}</option>
+            @endforeach
         </select>
         <select name="status" class="form-control" style="max-width:140px">
-
+            @foreach($statuses as $s)
+                <option value="{{ $s }}" {{ $status == $s ? 'selected' : '' }}>{{ Str::headline($s) }}</option>
+            @endforeach
         </select>
         <button class="btn btn-outline" type="submit">Filter</button>
-        <a class="btn btn-outline" href="{{route('admin.employees')}}">Reset</a>
+        <a class="btn btn-outline" href="{{ route('admin.employees') }}">Reset</a>
     </form>
 
     <!-- Employee Cards -->
@@ -37,18 +41,26 @@
             <div class="emp-card-info">
                 <div class="row"><span class="lbl">Dept</span><span><span class="badge badge-primary" style="font-size:10px"> {{$employee->department}}</span></span></div>
                 <div class="row"><span class="lbl">Salary</span><span class="fw-600">৳ {{$employee->salary}}</span></div>
-                <div class="row"><span class="lbl">Payment</span> {{$employee->payment_method}}<span>
+                <div class="row"><span class="lbl">Payment</span><span>{{$employee->payment_method}}
                 <div style="font-size:10px;color:var(--text-muted)"> </div>
                 <div style="font-size:10px;color:var(--text-muted)"></div>
-        </span></div>
+                 </span></div>
                 <div class="row"><span class="lbl">Phone</span><span>{{$employee->phone}}</span></div>
                 <div class="row"><span class="lbl">Joined</span><span>{{$employee->join_date}}</span></div>
-                <div class="row"><span class="lbl">Status</span><span>{{$employee->status}}</span></div>
+                @php
+                    $bs = ['active' => 'success', 'on_leave' => 'warning', 'inactive' => 'gray'];
+                @endphp
+                <div class="row"><span class="lbl ">Status</span><span Class="badge-{{ $bs[$employee->status] ?? 'gray' }}"> {{ Str::headline($employee->status) }}</span></div>
             </div>
             <div class="emp-card-actions">
                 <a class="btn btn-outline btn-sm" href="?edit={{$employee->id}}">Edit</a>
-                <a class="btn btn-outline btn-sm" href="?docs=">Docs</a>
-                <a class="btn btn-danger btn-sm" href="?delete=" onclick="return confirm('Delete this employee?')">Del</a>
+                <a class="btn btn-outline btn-sm" href="?docs={{$employee->id}}">Docs</a>
+                <form method="POST" action="{{ route('admin.employees.destroy', $employee->id) }}"
+                      onsubmit="return confirm('Delete this employee?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm">Del</button>
+                </form>
             </div>
         </div>
         @endforeach
@@ -139,7 +151,9 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             ">×</button></div>
             @if($editEmp)
-            <form method="POST" enctype="multipart/form-data" class="modal-body">
+            <form method="POST" action="{{route('admin.employees.update',$editEmp->id)}}" enctype="multipart/form-data" class="modal-body">
+                @csrf
+                @method('put')
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="id" value="">
                 <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Basic Info</p>
@@ -223,9 +237,10 @@
     <!-- ── DOCUMENTS MODAL ───────────────────────────────────────────────────── -->
     <div class="modal-overlay {{ request()->has('docs') ? 'open' : '' }}">
         <div class="modal">
-            <div class="modal-header"><h3>Documents — </h3><a class="modal-close" href="{{route('admin.employees')}}">×</a></div>
+            <div class="modal-header"><h3>Documents — {{$employee->name}}</h3><a class="modal-close" href="{{route('admin.employees')}}">×</a></div>
             <div class="modal-body">
-                <form method="POST" enctype="multipart/form-data" style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)">
+                <form method="POST" {{ route('admin.documents.store',$employee->id) }} enctype="multipart/form-data" style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)">
+                    @csrf
                     <input type="hidden" name="upload_doc" value="1">
                     <input type="hidden" name="employee_id" value="">
                     <div class="form-row">
@@ -266,5 +281,13 @@
             document.getElementById(prefix+'_mobile').style.display = (['bkash','nagad','rocket'].includes(val)) ? 'block' : 'none';
         }
     </script>
+    @if(session('modal_closed'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('editModal').classList.remove('open');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        </script>
+    @endif
 
 @endsection

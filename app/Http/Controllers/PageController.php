@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use App\Models\ProjectPayment;
 use App\Models\Task;
 use App\Models\ProjectExpense;
+use Illuminate\Support\Facades\Storage; // ✅ add this
+
 
 
 
@@ -52,8 +54,28 @@ class PageController extends Controller
     }
 
     public function Employees(Request $request){
-        $employees = Employee::all();
 
+//        search
+        $search = trim($request->query('search', ''));
+        $dept   = $request->query('dept', '');
+        $status = $request->query('status', '');
+        $employeeSearch = Employee::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            })
+            ->when($dept, function ($q) use ($dept) {
+                $q->where('department', $dept);
+            })
+            ->when($status, function ($q) use ($status) {
+                $q->where('status', $status);
+            })
+            ->get();
+
+
+        $employees = Employee::all();
         $editEmp = null;
         if ($request->has('edit')) {
             $editEmp = Employee::findOrFail($request->query('edit'));
@@ -62,15 +84,10 @@ class PageController extends Controller
         $depts = ['Web Dev', 'App Dev', 'Game Dev', 'Marketing', 'Design', 'Management'];
         $statuses = ['active', 'on_leave', 'inactive'];
 
-        return view('admin/employees', compact('employees', 'depts', 'editEmp', 'statuses'));
+        return view('admin/employees', compact('employees', 'depts', 'editEmp', 'statuses', 'employeeSearch', 'search', 'dept', 'status'));
     }
 
-//    public function EmployeeShow($id){
-//        $employeeShow = Employee::findOrFail($id);
-//        return view('admin/employees', compact('employeeShow', ));
-//    }
 
-//    employee store function
     public function EmployeeStore(Request $request)
     {
         $validated = $request->validate([
@@ -99,12 +116,66 @@ class PageController extends Controller
         return redirect()->back()->with('success', 'Employee created successfully!');
     }
 
+    public function EmployeeUpdate(Request $request, $id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        $validated = $request->validate([
+            'user_id'               => 'nullable|integer|exists:users,id',
+            'name'                  => 'nullable|string|max:100',
+            'email'                 => 'nullable|email|max:100|unique:employees,email,' . $id,
+            'phone'                 => 'nullable|string|max:20',
+            'department'            => 'nullable|in:Web Dev,App Dev,Game Dev,Marketing,Design,Management',
+            'designation'           => 'nullable|string|max:100',
+            'salary'                => 'nullable|numeric|min:0',
+            'join_date'             => 'nullable|date',
+            'nid'                   => 'nullable|string|max:50',
+            'address'               => 'nullable|string',
+            'status'                => 'nullable|in:active,on_leave,inactive',
+            'payment_method'        => 'nullable|in:bank,bkash,nagad,rocket,cash',
+            'bank_name'             => 'nullable|string|max:100',
+            'bank_account'          => 'nullable|string|max:100',
+            'mobile_banking_number' => 'nullable|string|max:20',
+            'photo'                 => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            if ($employee->photo) {
+                Storage::disk('public')->delete($employee->photo);
+            }
+            $validated['photo'] = $request->file('photo')->store('employees/photos', 'public');
+        }
+
+        $employee->update($validated);
+
+        return redirect()->back()
+            ->with('success', 'Employee updated successfully!')
+            ->with('modal_closed', true);
+    }
+
+
+//    project delete
+    public function EmployeeDestroy($id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        // ✅ Photo delete from storage
+        if ($employee->photo) {
+            Storage::disk('public')->delete($employee->photo);
+        }
+
+        $employee->delete();
+
+        return redirect()->back()->with('success', 'Employee deleted successfully!');
+    }
+
     public function Attendance(){
         return view('admin/attendance');
     }
     public function Salary(){
         return view('admin/salary');
     }
+
 
 
 //    project Index Function
@@ -304,5 +375,104 @@ class PageController extends Controller
         // redirect to login page with message
         return redirect('/login')->with('success', 'You have been logged out.');
     }
+
+
+
+
+//employee documents code
+    public function index($employee_id)
+    {
+        $documents = EmployeeDocument::where('employee_id', $employee_id)->get();
+
+        return view('admin.employee_documents.index', compact('documents', 'employee_id'));
+    }
+
+    // ✅ Show — single document
+    public function show($id)
+    {
+        $document = EmployeeDocument::findOrFail($id);
+
+        return view('admin.employee_documents.show', compact('document'));
+    }
+
+    // ✅ Store — save new document
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'employee_id' => 'required|integer|exists:employees,id',
+            'doc_name'    => 'required|string|max:255',
+            'doc_type'    => 'required|in:nid,passport,certificate,contract,other',
+            'file_path'   => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:5120',
+        ]);
+
+        // ✅ File upload
+        if ($request->hasFile('file_path')) {
+            $validated['file_path'] = $request->file('file_path')
+                ->store('employee_documents', 'public');
+        }
+
+        $validated['uploaded_at'] = now();
+
+        EmployeeDocument::create($validated);
+
+        return redirect()->back()->with('success', 'Document uploaded successfully!');
+    }
+
+    // ✅ Edit — show edit form
+    public function edit($id)
+    {
+        $document = EmployeeDocument::findOrFail($id);
+
+        return view('admin.employee_documents.edit', compact('document'));
+    }
+
+    // ✅ Update — update document
+    public function update(Request $request, $id)
+    {
+        $document = EmployeeDocument::findOrFail($id);
+
+        $validated = $request->validate([
+            'doc_name'  => 'required|string|max:255',
+            'doc_type'  => 'required|in:nid,passport,certificate,contract,other',
+            'file_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:5120',
+        ]);
+
+        // ✅ New file upload হলে পুরনো file delete করবে
+        if ($request->hasFile('file_path')) {
+            if ($document->file_path) {
+                Storage::disk('public')->delete($document->file_path); // ✅ old file delete
+            }
+            $validated['file_path'] = $request->file('file_path')
+                ->store('employee_documents', 'public');
+        }
+
+        $document->update($validated);
+
+        return redirect()->back()->with('success', 'Document updated successfully!');
+    }
+
+    // ✅ Destroy — delete document
+    public function destroy($id)
+    {
+        $document = EmployeeDocument::findOrFail($id);
+
+        // ✅ File storage থেকে delete
+        if ($document->file_path) {
+            Storage::disk('public')->delete($document->file_path);
+        }
+
+        $document->delete();
+
+        return redirect()->back()->with('success', 'Document deleted successfully!');
+    }
+
+
+
+
+
+
+
+
+
 
 }
