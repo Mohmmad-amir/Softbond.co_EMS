@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,16 +31,22 @@ Route::post('/admin/project/store', [PageController::class, 'ProjectStore'])->na
 Route::get('/admin/projects/{id}/edit/', [PageController::class, 'ProjectEdit'])->name('admin.projects.edit');
 Route::delete('/admin/projects/{id}/delete', [PageController::class, 'ProjectDestroy'])->name('admin.project.destroy');
 Route::put('/admin/projects/{id}update',      [PageController::class, 'ProjectUpdate'])->name('admin.projects.update');
-Route::get('admin/task', [PageController::class, "TaskIndex"])->name("admin.task");
 
 // employee documents
     Route::get('/admin/employees/{employee_id}/documents',        [PageController::class, 'index'])->name('admin.documents.index');
     Route::get('/admin/documents/{id}',                           [PageController::class, 'show'])->name('admin.documents.show');
     Route::post('/admin/documents/store',                         [PageController::class, 'store'])->name('admin.documents.store');
     Route::get('/admin/documents/{id}/edit',                      [PageController::class, 'edit'])->name('admin.documents.edit');
-    Route::put('/admin/documents/{id}/update',                    [PageController::class, 'update'])->name('admin.documents.update');
+    Route::put('/admin/documents/{id}/update',                    [PageController::class, 'DocumentsUpdate'])->name('admin.documents.update');
     Route::delete('/admin/documents/{id}/delete',                 [PageController::class, 'destroy'])->name('admin.documents.destroy');
 
+
+
+    Route::get('/admin/tasks',                  [TaskController::class, 'index'])->name('admin.tasks.index');
+    Route::post('/admin/tasks/store',           [TaskController::class, 'store'])->name('admin.tasks.store');
+    Route::put('/admin/tasks/{id}',             [TaskController::class, 'update'])->name('admin.tasks.update');
+    Route::patch('/admin/tasks/{id}/status',    [TaskController::class, 'statusUpdate'])->name('admin.tasks.status');
+    Route::delete('/admin/tasks/{id}',          [TaskController::class, 'destroy'])->name('admin.tasks.destroy');
 
 });
 

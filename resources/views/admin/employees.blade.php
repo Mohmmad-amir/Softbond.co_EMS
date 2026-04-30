@@ -241,6 +241,7 @@
             <div class="modal-body">
                 <form method="POST" {{ route('admin.documents.store',$employee->id) }} enctype="multipart/form-data" style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)">
                     @csrf
+                    @method('put')
                     <input type="hidden" name="upload_doc" value="1">
                     <input type="hidden" name="employee_id" value="">
                     <div class="form-row">

@@ -12,7 +12,7 @@ use Carbon\Carbon;
 use App\Models\ProjectPayment;
 use App\Models\Task;
 use App\Models\ProjectExpense;
-use Illuminate\Support\Facades\Storage; // ✅ add this
+use Illuminate\Support\Facades\Storage;
 
 
 
@@ -427,7 +427,7 @@ class PageController extends Controller
     }
 
     // ✅ Update — update document
-    public function update(Request $request, $id)
+    public function DocumentsUpdate(Request $request, $id)
     {
         $document = EmployeeDocument::findOrFail($id);
 
