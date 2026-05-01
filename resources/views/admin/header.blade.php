@@ -64,7 +64,7 @@
     </div>
   </nav>
   <div class="sidebar-footer">
-    <a href="/admin/profile.php" style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:6px;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='transparent'">
+    <a href="{{route('admin.profile.index')}}" style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:6px;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='transparent'">
         <div class="avatar av-blue">
             {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
         </div>

@@ -4,6 +4,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfitLossController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
@@ -62,6 +63,11 @@ Route::put('/admin/projects/{id}update',      [PageController::class, 'ProjectUp
 
 //    profit
     Route::get('/admin/profit-loss', [ProfitLossController::class, 'index'])->name('admin.profit.index');
+
+//profile
+    Route::get('/admin/profile',           [ProfileController::class, 'index'])->name('admin.profile.index');
+    Route::post('/admin/profile/update',   [ProfileController::class, 'updateProfile'])->name('admin.profile.update');
+    Route::post('/admin/profile/password', [ProfileController::class, 'updatePassword'])->name('admin.profile.password');
 
 
 });
