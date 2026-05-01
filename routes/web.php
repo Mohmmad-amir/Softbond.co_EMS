@@ -4,6 +4,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfitLossController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,6 +59,9 @@ Route::put('/admin/projects/{id}update',      [PageController::class, 'ProjectUp
     Route::post('/admin/expenses/store',   [ExpenseController::class, 'store'])->name('admin.expenses.store');
     Route::put('/admin/expenses/{id}',     [ExpenseController::class, 'update'])->name('admin.expenses.update');
     Route::delete('/admin/expenses/{id}',  [ExpenseController::class, 'destroy'])->name('admin.expenses.destroy');
+
+//    profit
+    Route::get('/admin/profit-loss', [ProfitLossController::class, 'index'])->name('admin.profit.index');
 
 
 });
