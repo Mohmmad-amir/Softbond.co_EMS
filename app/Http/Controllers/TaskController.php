@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    // ✅ Index — list all tasks with filter
+    //  Index — list all tasks with filter
     public function index(Request $request)
     {
         $filterProj = $request->query('project', '');
@@ -20,7 +20,7 @@ class TaskController extends Controller
             ->when($filterEmp,  fn($q) => $q->where('assigned_to', $filterEmp))
             ->get();
 
-        // ✅ Edit task
+        //  Edit task
         $editTask = null;
         if ($request->has('edit')) {
             $editTask = Task::findOrFail($request->query('edit'));
@@ -32,7 +32,7 @@ class TaskController extends Controller
         return view('admin.tasks', compact('tasks', 'editTask', 'pArr', 'eArr', 'filterProj', 'filterEmp'));
     }
 
-    // ✅ Store — save new task
+    //  Store — save new task
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -50,7 +50,7 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'Task assigned successfully!');
     }
 
-    // ✅ Update — update existing task
+    //  Update — update existing task
     public function update(Request $request, $id)
     {
         $task = Task::findOrFail($id);
@@ -71,7 +71,7 @@ class TaskController extends Controller
             ->with('success', 'Task updated successfully!');
     }
 
-    // ✅ Status update — quick status change from dropdown
+    //  Status update — quick status change from dropdown
     public function statusUpdate(Request $request, $id)
     {
         $task = Task::findOrFail($id);
@@ -85,7 +85,7 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'Status updated!');
     }
 
-    // ✅ Destroy — delete task
+    //  Destroy — delete task
     public function destroy($id)
     {
         Task::findOrFail($id)->delete();

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
@@ -40,13 +41,16 @@ Route::put('/admin/projects/{id}update',      [PageController::class, 'ProjectUp
     Route::put('/admin/documents/{id}/update',                    [PageController::class, 'DocumentsUpdate'])->name('admin.documents.update');
     Route::delete('/admin/documents/{id}/delete',                 [PageController::class, 'destroy'])->name('admin.documents.destroy');
 
-
-
+// task function
     Route::get('/admin/tasks',                  [TaskController::class, 'index'])->name('admin.tasks.index');
     Route::post('/admin/tasks/store',           [TaskController::class, 'store'])->name('admin.tasks.store');
     Route::put('/admin/tasks/{id}',             [TaskController::class, 'update'])->name('admin.tasks.update');
     Route::patch('/admin/tasks/{id}/status',    [TaskController::class, 'statusUpdate'])->name('admin.tasks.status');
     Route::delete('/admin/tasks/{id}',          [TaskController::class, 'destroy'])->name('admin.tasks.destroy');
+
+//    Attendance
+    Route::get('/admin/attendance',  [AttendanceController::class, 'index'])->name('admin.attendance.index');
+    Route::post('/admin/attendance', [AttendanceController::class, 'store'])->name('admin.attendance.store');
 
 });
 

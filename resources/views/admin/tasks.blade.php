@@ -1,18 +1,7 @@
 @extends('admin/header')
 @section('content')
-    {{-- ✅ Success Message --}}
-    @if(session('success'))
-        <div class="alert alert-success" id="successAlert">
-            {{ session('success') }}
-            <script>
-                setTimeout(() => {
-                    document.getElementById('successAlert').style.opacity = '0';
-                }, 3000);
-            </script>
-        </div>
-    @endif
 
-    {{-- ✅ Page Header --}}
+    {{--  Page Header --}}
     <div class="page-header">
         <div><h2>Tasks</h2><p>Assign and manage project tasks</p></div>
         <button class="btn btn-primary"
@@ -21,7 +10,7 @@
         </button>
     </div>
 
-    {{-- ✅ Filter Form --}}
+    {{--  Filter Form --}}
     <form method="GET" action="{{ route('admin.tasks.index') }}"
           style="display:flex;gap:10px;margin-bottom:20px">
 
@@ -47,7 +36,7 @@
         <a href="{{ route('admin.tasks.index') }}" class="btn btn-outline">Reset</a>
     </form>
 
-    {{-- ✅ Tasks Table --}}
+    {{--  Tasks Table --}}
     <div class="card">
         <div class="table-wrap">
             <table class="data-table">
@@ -78,7 +67,7 @@
                         </span>
                         </td>
                         <td>
-                            {{-- ✅ Quick status update --}}
+                            {{--  Quick status update --}}
                             <form method="POST"
                                   action="{{ route('admin.tasks.status', $t->id) }}">
                                 @csrf
@@ -94,10 +83,10 @@
                         </td>
                         <td>
                             <div style="display:flex;gap:4px">
-                                {{-- ✅ Edit --}}
+                                {{--  Edit --}}
                                 <a href="?edit={{ $t->id }}" class="btn btn-outline btn-xs">Edit</a>
 
-                                {{-- ✅ Delete --}}
+                                {{--  Delete --}}
                                 <form method="POST"
                                       action="{{ route('admin.tasks.destroy', $t->id) }}"
                                       onsubmit="return confirm('Delete this task?')">
@@ -118,7 +107,7 @@
         </div>
     </div>
 
-    {{-- ✅ Add Modal --}}
+    {{--  Add Modal --}}
     <div class="modal-overlay" id="addModal">
         <div class="modal">
             <div class="modal-header">
@@ -195,7 +184,7 @@
         </div>
     </div>
 
-    {{-- ✅ Edit Modal --}}
+    {{--  Edit Modal --}}
     @if($editTask)
         <div class="modal-overlay open" id="editModal">
             <div class="modal">

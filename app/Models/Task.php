@@ -24,7 +24,7 @@ class Task extends Model
         'due_date' => 'date',
     ];
 
-    // ✅ Relationships
+    //  Relationships
     public function project()
     {
         return $this->belongsTo(Project::class, 'project_id');
