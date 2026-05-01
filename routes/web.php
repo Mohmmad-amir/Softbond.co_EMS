@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\EmployeeTaskController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
@@ -9,9 +10,7 @@ use App\Http\Controllers\ProfitLossController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
-//Route::get('/', function () {
-//    return view('welcome');
-//});
+
 Route::get("/login", [AuthController::class, "showLogin"])->name("admin.login");
 route::post("/login", [AuthController::class, "login"])->name("login");
 
@@ -69,6 +68,12 @@ Route::put('/admin/projects/{id}update',      [PageController::class, 'ProjectUp
     Route::post('/admin/profile/update',   [ProfileController::class, 'updateProfile'])->name('admin.profile.update');
     Route::post('/admin/profile/password', [ProfileController::class, 'updatePassword'])->name('admin.profile.password');
 
+
+//user panel code
+
+    Route::get('/', [PageController::class, 'userDashboard'])->name('employee.dashboard');
+    Route::get('/employee/tasks',                    [EmployeeTaskController::class, 'index'])->name('employee.tasks.index');
+    Route::post('/employee/tasks/{id}/status',       [EmployeeTaskController::class, 'updateStatus'])->name('employee.tasks.status');
 
 });
 

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\EmployeeDocument;
+use App\Models\SalaryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -476,10 +478,55 @@ class PageController extends Controller
     }
 
 
+//    user panel functions
 
 
+    public function userDashboard()
+    {
+        $emp   = Auth::user()->employee; //  logged in employee
+        $empId = $emp->id;
 
+        //  Task counts
+        $totalTasks   = Task::where('assigned_to', $empId)->count();
+        $doneTasks    = Task::where('assigned_to', $empId)->where('status', 'done')->count();
+        $pendingTasks = Task::where('assigned_to', $empId)->where('status', 'pending')->count();
 
+        //  Attendance this month
+        $monthAtt = Attendance::where('employee_id', $empId)
+            ->where('status', 'present')
+            ->whereMonth('date', now()->month)
+            ->whereYear('date', now()->year)
+            ->count();
+
+        //  Today's attendance
+        $todayAtt = Attendance::where('employee_id', $empId)
+            ->whereDate('date', now()->toDateString())
+            ->first();
+
+        //  Recent tasks
+        $recentTasks = Task::with('project')
+            ->where('assigned_to', $empId)
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get();
+
+        //  Recent salary requests
+        $salaryRequests = SalaryRequest::where('employee_id', $empId)
+            ->orderByDesc('requested_at')
+            ->limit(3)
+            ->get();
+
+        return view('employee.dashboard', compact(
+            'emp',
+            'totalTasks',
+            'doneTasks',
+            'pendingTasks',
+            'monthAtt',
+            'todayAtt',
+            'recentTasks',
+            'salaryRequests'
+        ));
+    }
 
 
 

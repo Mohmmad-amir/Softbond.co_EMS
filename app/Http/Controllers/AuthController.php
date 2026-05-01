@@ -24,7 +24,7 @@ public function login(Request $request) {
                 return redirect()->route('admin.dashboard');
             }
             if ($user->role == 'employee') {
-                return redirect()->route('/');
+                return redirect()->route('employee.dashboard');
             }
             return redirect()->route('admin.login');
         }

@@ -66,3 +66,9 @@ $flash = getFlash();
 if ($flash): ?>
   <div class="alert alert-<?= $flash['type'] ?>"><?= e($flash['msg']) ?></div>
 <?php endif; ?>
+
+    @yield('content')
+
+</div></div></div>
+</body>
+</html>
