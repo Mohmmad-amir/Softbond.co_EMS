@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
@@ -51,6 +52,13 @@ Route::put('/admin/projects/{id}update',      [PageController::class, 'ProjectUp
 //    Attendance
     Route::get('/admin/attendance',  [AttendanceController::class, 'index'])->name('admin.attendance.index');
     Route::post('/admin/attendance', [AttendanceController::class, 'store'])->name('admin.attendance.store');
+
+//    expense
+    Route::get('/admin/expenses',          [ExpenseController::class, 'index'])->name('admin.expenses.index');
+    Route::post('/admin/expenses/store',   [ExpenseController::class, 'store'])->name('admin.expenses.store');
+    Route::put('/admin/expenses/{id}',     [ExpenseController::class, 'update'])->name('admin.expenses.update');
+    Route::delete('/admin/expenses/{id}',  [ExpenseController::class, 'destroy'])->name('admin.expenses.destroy');
+
 
 });
 

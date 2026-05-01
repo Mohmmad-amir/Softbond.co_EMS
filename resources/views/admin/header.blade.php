@@ -53,7 +53,7 @@
     </div>
     <div class="nav-section">
       <div class="nav-section-label">Finance</div>
-      <a class="nav-item " href="/admin/expenses.php">
+      <a class="nav-item " href={{route('admin.expenses.index')}}>
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
         Expenses
       </a>
