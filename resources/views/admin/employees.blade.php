@@ -235,6 +235,7 @@
         </div></div>
 
     <!-- ── DOCUMENTS MODAL ───────────────────────────────────────────────────── -->
+    @if(isset($employee))
     <div class="modal-overlay {{ request()->has('docs') ? 'open' : '' }}">
         <div class="modal">
             <div class="modal-header"><h3>Documents — {{$employee->name}}</h3><a class="modal-close" href="{{route('admin.employees')}}">×</a></div>
@@ -274,7 +275,7 @@
                 </table>
             </div>
         </div></div>
-
+    @endif
     <script>
         function togglePayment(sel, prefix) {
             const val = sel.value;

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmployeeDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -90,8 +91,13 @@ class PageController extends Controller
 
     public function EmployeeStore(Request $request)
     {
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => bcrypt($request->password),
+//            'role'     => 'employee',
+        ]);
         $validated = $request->validate([
-            'user_id'               => 'nullable|integer|exists:users,id',
             'name'                  => 'required|string|max:100',
             'email'                 => 'required|email|max:100|unique:employees,email',
             'phone'                 => 'nullable|string|max:20',
@@ -108,6 +114,9 @@ class PageController extends Controller
             'mobile_banking_number' => 'nullable|string|max:20',
             'photo'                 => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        $validated['user_id'] = $user->id;
+
 
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('employees/photos', 'public');
@@ -158,7 +167,7 @@ class PageController extends Controller
     public function EmployeeDestroy($id)
     {
         $employee = Employee::findOrFail($id);
-
+        $employee->user()->delete();
         // ✅ Photo delete from storage
         if ($employee->photo) {
             Storage::disk('public')->delete($employee->photo);

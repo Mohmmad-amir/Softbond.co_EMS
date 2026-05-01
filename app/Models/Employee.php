@@ -36,7 +36,10 @@ class Employee extends Model
         'mobile_banking_number',
         'photo',
     ];
-
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     protected $casts = [
         'salary'    => 'decimal:2',
         'join_date' => 'date',

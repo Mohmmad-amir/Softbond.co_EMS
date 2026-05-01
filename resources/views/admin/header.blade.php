@@ -46,18 +46,18 @@
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         Projects
       </a>
-      <a class="nav-item {{ request()->routeIs('admin.task') ? 'active' : '' }}" href="{{ route('admin.tasks.index') }}">
+      <a class="nav-item {{ request()->routeIs('admin.tasks.index') ? 'active' : '' }}" href="{{ route('admin.tasks.index') }}">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         Tasks
       </a>
     </div>
     <div class="nav-section">
       <div class="nav-section-label">Finance</div>
-      <a class="nav-item " href={{route('admin.expenses.index')}}>
+      <a class="nav-item {{ request()->routeIs('admin.expenses.index') ? 'active' : '' }} " href={{route('admin.expenses.index')}}>
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
         Expenses
       </a>
-      <a class="nav-item " href="{{route('admin.profit.index')}}">
+      <a class="nav-item {{ request()->routeIs('admin.profit.index') ? 'active' : '' }}" href="{{route('admin.profit.index')}}">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
         Profit &amp; Loss
       </a>
@@ -85,6 +85,17 @@
   </div>
 </div>
 <div class="page-body">
+    @if(session('success'))
+        <div class="alert alert-success" id="successAlert">
+            {{ session('success') }}
+            <script>
+                setTimeout(() => {
+                    const el = document.getElementById('successAlert');
+                    if(el) el.style.opacity = '0';
+                }, 3000);
+            </script>
+        </div>
+    @endif
 
         @if ($errors->any())
             <div style="background:#fee;padding:10px;margin-bottom:10px;border-radius:5px;color:red;">
