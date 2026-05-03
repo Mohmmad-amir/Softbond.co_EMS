@@ -1,12 +1,16 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\EmployeeAttendanceController;
+use App\Http\Controllers\EmployeeProfileController;
+use App\Http\Controllers\EmployeeSalaryController;
 use App\Http\Controllers\EmployeeTaskController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfitLossController;
+use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,8 +24,6 @@ Route::get("/admin/employees", [pageController::class, "Employees"])->name("admi
 Route::post('/admin/employees/store', [PageController::class, 'EmployeeStore'])->name('admin.employees.store');
 Route::put('/admin/employees/{id}', [PageController::class, 'EmployeeUpdate'])->name('admin.employees.update');
 Route::delete('/admin/employees/{id}', [PageController::class, 'EmployeeDestroy'])->name('admin.employees.destroy');
-//Route::get('/admin/employees/{id}/show', [PageController::class, 'EmployeeShow'])->name('admin.employees.show');
-Route::get("/admin/attendance", [pageController::class, "Attendance"])->name("admin.attendance");
 Route::get("/admin/salary", [pageController::class, "Salary"])->name("admin.salary");
 Route::get("/admin/project/", [pageController::class, "Project"])->name("admin.project");
 Route::get('/admin/projects/{id}', [PageController::class, 'projectDetail'])->name('admin.projects.show');
@@ -54,6 +56,12 @@ Route::put('/admin/projects/{id}update',      [PageController::class, 'ProjectUp
     Route::get('/admin/attendance',  [AttendanceController::class, 'index'])->name('admin.attendance.index');
     Route::post('/admin/attendance', [AttendanceController::class, 'store'])->name('admin.attendance.store');
 
+//    salary
+    Route::get('/admin/salary',                [SalaryController::class, 'index'])->name('admin.salary.index');
+    Route::post('/admin/salary/{id}/approve',  [SalaryController::class, 'approve'])->name('admin.salary.approve');
+    Route::post('/admin/salary/{id}/deny',     [SalaryController::class, 'deny'])->name('admin.salary.deny');
+
+
 //    expense
     Route::get('/admin/expenses',          [ExpenseController::class, 'index'])->name('admin.expenses.index');
     Route::post('/admin/expenses/store',   [ExpenseController::class, 'store'])->name('admin.expenses.store');
@@ -74,6 +82,13 @@ Route::put('/admin/projects/{id}update',      [PageController::class, 'ProjectUp
     Route::get('/', [PageController::class, 'userDashboard'])->name('employee.dashboard');
     Route::get('/employee/tasks',                    [EmployeeTaskController::class, 'index'])->name('employee.tasks.index');
     Route::post('/employee/tasks/{id}/status',       [EmployeeTaskController::class, 'updateStatus'])->name('employee.tasks.status');
+    Route::get('/employee/attendance', [EmployeeAttendanceController::class, 'index'])->name('employee.attendance.index');//    Route::get('/employee/salary',     [EmployeeSalaryController::class,     'index'])->name('employee.salary.index');
+    Route::get('/employee/profile',           [EmployeeProfileController::class, 'index'])->name('employee.profile.index');
+    Route::post('/employee/profile/update',   [EmployeeProfileController::class, 'updateProfile'])->name('employee.profile.update');
+    Route::post('/employee/profile/password', [EmployeeProfileController::class, 'updatePassword'])->name('employee.profile.password');
+
+    Route::get('/employee/salary',        [EmployeeSalaryController::class, 'index'])->name('employee.salary.index');
+    Route::post('/employee/salary/store', [EmployeeSalaryController::class, 'store'])->name('employee.salary.store');
 
 });
 

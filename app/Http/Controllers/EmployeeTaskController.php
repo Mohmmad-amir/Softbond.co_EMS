@@ -34,7 +34,7 @@ class EmployeeTaskController extends Controller
         $pending = Task::where('assigned_to', $empId)->where('status', 'pending')->count();
         $done    = Task::where('assigned_to', $empId)->where('status', 'done')->count();
 
-        return view('employee.tasks.index', compact(
+        return view('employee.tasks', compact(
             'tasks',
             'filter',
             'total',

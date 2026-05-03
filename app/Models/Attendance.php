@@ -22,7 +22,7 @@ class Attendance extends Model
     ];
 
     protected $casts = [
-        'att_date' => 'date',
+        'date' => 'date',
     ];
 
     // ✅ Relationship

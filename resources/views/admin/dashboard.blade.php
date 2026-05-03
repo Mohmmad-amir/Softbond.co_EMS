@@ -38,51 +38,72 @@
 </div>
 
 <div class="grid-2">
-  <div class="card">
-    <div class="card-header"><span class="card-title">Revenue vs Expenses ({{date('Y')}})</span></div>
-    <div class="card-body">
-      <canvas id="revChart" height="220" role="img" aria-label="Revenue vs expenses chart">Revenue and expenses data.</canvas>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">Pending Salary Requests</span>
-{{--      <?php //if ($pendingSal): ?>--}}
 
-        <span class="badge badge-danger">
-
-{{--            <?php //= $pendingSal ?>--}}
-
-            pending</span>
-
-{{--        <?php //endif; ?>--}}
-    <div class="card-body" style="padding:0">
-{{--      <?php--}}
-{{--//      $salReqs->data_seek(0);--}}
-{{--//      $hasSal = false--}}
-{{--//      while ($r = $salReqs->fetch_assoc()): $hasSal = true ?>--}}
-      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)">
-        <div class="avatar av-blue">{{--<?php //= strtoupper(substr($r['name'],0,2)) ?><!---->--}}</div>
-        <div style="flex:1"><div class="fw-600">{{--<?php //= e($r['name']) ?><!---->--}}</div><div class="text-muted" style="font-size:11px">{{--<?php = e($r['designation']) ?>--}}<!----> · ৳{{--<?php = number_format($r['amount']) ?>--}}<!----></div></div>
-        <div style="display:flex;gap:4px">
-          <a href="<!---->/admin/salary.php?action=approve&id=
-
-{{--<?php //= $r['id'] ?><!---->--}}
-" class="btn btn-success btn-xs">Approve</a>
-          <a href="<!---->/admin/salary.php?action=deny&id=
-
-{{--<?php //= $r['id'] ?><!---->--}}
-" class="btn btn-danger btn-xs">Deny</a>
+    {{-- ✅ Revenue vs Expenses Chart --}}
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Revenue vs Expenses ({{ $year }})</span>
         </div>
-      </div>
-{{--      <?php endwhile ?>--}}
-{{--      <?php //if (!$hasSal): ?>--}}
-
-        <div class="empty-state">No pending requests</div>
-
-{{--        <?php //endif ?>--}}
+        <div class="card-body">
+            <canvas id="revChart" height="220"
+                    role="img" aria-label="Revenue vs expenses chart">
+            </canvas>
+        </div>
     </div>
-  </div>
-</div>
+
+    {{--  Pending Salary Requests --}}
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Pending Salary Requests</span>
+            @if($pendingSal > 0)
+                <span class="badge badge-danger">{{ $pendingSal }} pending</span>
+            @endif
+        </div>
+        <div class="card-body" style="padding:0">
+            @forelse($salReqs as $r)
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)">
+
+                    {{--  Avatar --}}
+                    <div class="avatar av-blue">
+                        {{ strtoupper(substr($r->employee->name, 0, 2)) }}
+                    </div>
+
+                    {{--  Info --}}
+                    <div style="flex:1">
+                        <div class="fw-600">{{ $r->employee->name }}</div>
+                        <div class="text-muted" style="font-size:11px">
+                            {{ $r->employee->designation }} · ৳{{ number_format($r->amount) }}
+                        </div>
+                    </div>
+
+                    {{--  Approve/Deny buttons --}}
+                    <div style="display:flex;gap:4px">
+                        <form method="POST"
+                              action="{{ route('admin.salary.approve', $r->id) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-xs">
+                                Approve
+                            </button>
+                        </form>
+
+                        <form method="POST"
+                              action="{{ route('admin.salary.deny', $r->id) }}"
+                              onsubmit="return confirm('Deny this request?')">
+                            @csrf
+                            <button type="submit" class="btn btn-danger btn-xs">
+                                Deny
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @empty
+                <div class="empty-state" style="padding:24px">
+                    No pending requests
+                </div>
+            @endforelse
+        </div>
+    </div>
+
 </div>
 
 <div class="card">
@@ -121,23 +142,48 @@
   </div>
 </div>
 
+
+{{--  Chart.js --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const mData = <?= json_encode($monthlyData) ?>;
-new Chart(document.getElementById('revChart'), {
-  type: 'bar',
-  data: {
-    labels: months,
-    datasets: [
-      { label: 'Revenue', data: mData.map(d=>d.rev), backgroundColor: '#2563eb', borderRadius: 4 },
-      { label: 'Expenses', data: mData.map(d=>d.exp), backgroundColor: '#10b981', borderRadius: 4 }
-    ]
-  },
-  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { y: { ticks: { callback: v => '৳'+v } } } }
-});
+    const monthlyData = @json($monthlyData);
+    const labels      = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    new Chart(document.getElementById('revChart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label:           'Revenue',
+                    data:            monthlyData.map(d => d.rev),
+                    backgroundColor: '#2563eb',
+                    borderRadius:    4,
+                },
+                {
+                    label:           'Expenses',
+                    data:            monthlyData.map(d => d.exp),
+                    backgroundColor: '#ef4444',
+                    borderRadius:    4,
+                }
+            ]
+        },
+        options: {
+            responsive:          true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { boxWidth: 10, font: { size: 11 } }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { callback: v => '৳' + v }
+                }
+            }
+        }
+    });
 </script>
-<?php //require 'footer.blade.php'; ?>
 
 @endsection
 

@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use App\Models\ProjectPayment;
 use App\Models\Task;
 use App\Models\ProjectExpense;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -52,8 +53,44 @@ class PageController extends Controller
         }
         // recent 5 project
         $recentProjects = Project::latest()->take(5)->get();
+
+
+        //  Pending salary requests
+        $salReqs     = SalaryRequest::with('employee')
+            ->where('status', 'pending')
+            ->orderByDesc('requested_at')
+            ->get();
+        $pendingSal  = $salReqs->count();
+
+        //  Monthly Revenue vs Expenses for chart
+        $year        = now()->year;
+        $monthlyData = [];
+
+        for ($m = 1; $m <= 12; $m++) {
+            $rev = DB::table('projects')
+                ->whereYear('start_date', $year)
+                ->whereMonth('start_date', $m)
+                ->sum('received');
+
+            $exp = DB::table('expenses')
+                ->whereYear('date', $year)
+                ->whereMonth('date', $m)
+                ->sum('amount');
+
+            $monthlyData[] = [
+                'rev' => (float) $rev,
+                'exp' => (float) $exp,
+            ];
+        }
+
+        $pendingSalary = SalaryRequest::where('status', 'pending')->count();
+
+
 //        return view with variables
-        return view('admin/dashboard', compact('totalUser', 'activeProjectCount', 'monthRev', 'monthEXP', 'monthlyData', 'recentProjects'));
+        return view('admin/dashboard', compact('totalUser', 'activeProjectCount', 'monthRev', 'monthEXP', 'monthlyData', 'recentProjects', 'salReqs',
+            'pendingSal',
+            'monthlyData',
+            'year', 'pendingSalary'));
     }
 
     public function Employees(Request $request){

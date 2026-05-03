@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\SalaryRequest;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,5 +22,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        View::composer('*', function ($view) {
+            if (auth()->check()) {
+                $view->with('pendingSalary', SalaryRequest::where('status', 'pending')->count());
+            }
+        });
     }
 }

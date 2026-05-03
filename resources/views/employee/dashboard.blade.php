@@ -105,7 +105,7 @@
         <div class="card">
             <div class="card-header">
                 <span class="card-title">My Salary Requests</span>
-                <a href="{{ route('employee.salary.index') }}" class="btn btn-outline btn-sm">Manage</a>
+{{--                <a href="{{ route('employee.salary.index') }}" class="btn btn-outline btn-sm">Manage</a>--}}
             </div>
             <div style="padding:0 4px">
                 @forelse($salaryRequests as $r)
